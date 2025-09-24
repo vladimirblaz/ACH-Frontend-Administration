@@ -1,5 +1,5 @@
 <template>
-    <div class="px-80 pt-20 gap-20">
+    <div class="container mx-auto px-10 pt-20 gap-20">
         <XMenuBar :model="menuItems">
             <template #item="{ item, props, hasSubmenu }">
                 <template v-if="item.items">
