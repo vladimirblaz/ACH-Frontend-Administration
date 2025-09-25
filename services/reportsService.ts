@@ -5,12 +5,17 @@ import type {
   RequestTransactionalResponse,
   IndividualTransactionResponse
 } from './../features/reports/types';
+import { useLoading } from "~/componsables/useLoading";
 
 
 class ReportsService {
   private baseURL = API_CONFIG.BASE_URL;
 
-  private async request<T>(endpoint: string, options: Record<string, string | unknown> = {}): Promise<T> {
+  private async request<T>(endpoint: string, options: Record<string, string | unknown> = {}, message: string = ""): Promise<T> {
+    const loading = useLoading();
+    
+    loading.showLoading(message);
+
     try {
       const url = `${this.baseURL}/${endpoint}`;
 
@@ -27,9 +32,11 @@ class ReportsService {
       }
 
       return await response.json();
-  } catch (error) {
+    } catch (error) {
       console.error('Error en la solicitud:', error);
       throw error;
+    } finally {
+      loading.hideLoading();
     }
   }
 
@@ -41,7 +48,7 @@ class ReportsService {
   }
 
   async postRequestTransactional(request: RequestTransactionalRequest): Promise<RequestTransactionalResponse> {
-    return this.request<RequestTransactionalResponse>(`analytics/reports/transactional`, { body: JSON.stringify(request) });
+    return this.request<RequestTransactionalResponse>(`analytics/reports/transactional`, { body: JSON.stringify(request), method: "POST" }, "Estamos procesando tu búsqueda");
   }
 
   async getIndividualTransaction(traceNumber: string): Promise<IndividualTransactionResponse> {

@@ -18,7 +18,7 @@
         @click="showFilters = !showFilters"
       >
         {{ showFilters ? "Ocultar criterios de búsqueda" : "Más criterios de búsqueda" }}
-        <Icon :name="showFilters ? 'x:nav-arrow-down' : 'x:nav-arrow-up'" class="ml-3" />
+        <Icon name="x:thik-nav-arrow-down" class="ml-3 transition-all" :class="[ showFilters && 'rotate-180' ]" />
       </h3>
     </div>
 
@@ -26,22 +26,18 @@
     <transition name="fade">
       <div v-show="showFilters" class="mt-8 mx-5">
         <!-- Subtítulo alineado a la izquierda -->
-        <h3 class="text-gray-700 font-medium text-base">
-          Tipo de Transferencia
-        </h3>
+        <h3 class="text-gray-700 font-medium text-base">Tipo de Transferencia</h3>
 
         <AdminReportsFilterTransferDetailsSelector
           v-model="transactionCodeString"
-          :options="props.optionsFilters?.transactions"
+          :options="props.optionsFilters?.transactions ?? []"
         />
 
-        <h3 class="text-gray-700 font-medium text-base mt-8">
-          Moneda
-        </h3>
+        <h3 class="text-gray-700 font-medium text-base mt-8">Moneda</h3>
 
         <AdminReportsFilterTransferDetailsSelector
           v-model="currencyCodeString"
-          :options="props.optionsFilters?.currencies"
+          :options="props.optionsFilters?.currencies ?? []"
         />
       </div>
     </transition>

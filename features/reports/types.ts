@@ -78,6 +78,20 @@ export interface Filters {
   }[];
 }
 
+export interface Transfers {
+  traceNumber: string;
+  formattedDate: string;
+  formattedHour: string;
+  originatorAccountNumber: string;
+  originatorParticipantAcronym: string;
+  receiverAccountNumber: string;
+  receiverParticipantAcronym: string;
+  currencyDisplayName: string;
+  amount: number;
+  transactionDisplayName: string;
+  statusDisplayName: string;
+}
+
 export interface OptionsResponse {
   Filters: Filters;
 }
@@ -85,6 +99,7 @@ export interface OptionsResponse {
 export interface RequestTransactionalRequest {
   isInbound: boolean;
   isOutbound: boolean;
+  formattedDate: string;
   customerIdentifierCode: string;
   customerIdentifier: string;
   currencyCodes: string[];
@@ -94,19 +109,7 @@ export interface RequestTransactionalRequest {
 }
 
 export interface RequestTransactionalResponse {
-  transfers: {
-    traceNumber: string;
-    formattedDate: string;
-    formattedHour: string;
-    originatorAccountNumber: string;
-    originatorParticipantAcronym: string;
-    receiverAccountNumber: string;
-    receiverParticipantAcronym: string;
-    currencyDisplayName: string;
-    amount: number;
-    transactionDisplayName: string;
-    statusDisplayName: string;
-  }[];
+  transfers: Transfers[];
 }
 
 

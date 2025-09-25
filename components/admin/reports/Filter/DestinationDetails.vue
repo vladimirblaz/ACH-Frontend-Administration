@@ -8,13 +8,12 @@
       <h3 class="font-semibold text-xl text-[#2A303A]">{{ props.movementType == "SENT" ? "Datos del destinatario" : "Datos del originante" }}</h3>
 
       <XInputText
-        v-model="accountNumber1"
+        v-model="accountNumber"
         name="accountNumber"
         label="Numero de cuenta"
         placeholder="Ingresa numero"
         :validation="(val: string) => (val ?? '').replace(/[^0-9-]/g, '').substring(0, 20)"
       />
-      {{ accountNumber1 }}
 
       <div class="flex justify-center mt-4">
         <h3
@@ -22,7 +21,7 @@
           @click="showFilters = !showFilters"
         >
           {{ showFilters ? "Ocultar criterios de búsqueda" : "Más criterios de búsqueda" }}
-          <Icon :name=" showFilters ? 'x:nav-arrow-down' : 'x:nav-arrow-up'" class="ml-3" />
+          <Icon name="x:thik-nav-arrow-down" class="ml-3 transition-all" :class="[ showFilters && 'rotate-180' ]" />
         </h3>
       </div>
       <!-- Sección desplegable centrada -->
@@ -53,8 +52,6 @@
     optionsFilters: Filters;
   }>();
 
-
-  const accountNumber1 = ref("");
 
   const accountNumber = defineModel<string>("account-number", { default: "" });
   const externalParticipantCode = defineModel<string>("external-participant-code");
