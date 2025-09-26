@@ -18,15 +18,15 @@
       <div class="flex justify-center mt-4">
         <h3
           class="text-primary font-normal text-[12px] m-0 cursor-pointer hover:underline flex items-center gap-1"
-          @click="showFilters = !showFilters"
+          @click="destinationShowMore = !destinationShowMore"
         >
-          {{ showFilters ? "Ocultar criterios de búsqueda" : "Más criterios de búsqueda" }}
-          <Icon name="x:thik-nav-arrow-down" class="ml-3 transition-all" :class="[ showFilters && 'rotate-180' ]" />
+          {{ destinationShowMore ? "Ocultar criterios de búsqueda" : "Más criterios de búsqueda" }}
+          <Icon name="x:thik-nav-arrow-down" class="ml-3 transition-all" :class="[ destinationShowMore && 'rotate-180' ]" />
         </h3>
       </div>
       <!-- Sección desplegable centrada -->
       <transition name="fade">
-        <div v-show="showFilters" class="mt-4">
+        <div v-show="destinationShowMore" class="mt-4">
           <XSelect
             v-model="externalParticipantCode"
             name="externalParticipantCode"
@@ -55,9 +55,7 @@
 
   const accountNumber = defineModel<string>("account-number", { default: "" });
   const externalParticipantCode = defineModel<string>("external-participant-code");
-
-
-  const showFilters = ref(false);
+  const destinationShowMore = defineModel<boolean>("destination-show-more", { default: false });
 </script>
 
 <style scoped>

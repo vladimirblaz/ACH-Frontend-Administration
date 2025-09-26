@@ -15,21 +15,21 @@
     <div class="flex justify-center mt-4">
       <h3
         class="text-primary font-normal text-[12px] m-0 cursor-pointer hover:underline flex items-center gap-1"
-        @click="showFilters = !showFilters"
+        @click="transferShowMore = !transferShowMore"
       >
-        {{ showFilters ? "Ocultar criterios de búsqueda" : "Más criterios de búsqueda" }}
-        <Icon name="x:thik-nav-arrow-down" class="ml-3 transition-all" :class="[ showFilters && 'rotate-180' ]" />
+        {{ transferShowMore ? "Ocultar criterios de búsqueda" : "Más criterios de búsqueda" }}
+        <Icon name="x:thik-nav-arrow-down" class="ml-3 transition-all" :class="[ transferShowMore && 'rotate-180' ]" />
       </h3>
     </div>
 
     <!-- Sección desplegable centrada -->
     <transition name="fade">
-      <div v-show="showFilters" class="mt-8 mx-5">
+      <div v-show="transferShowMore" class="mt-8 mx-5">
         <!-- Subtítulo alineado a la izquierda -->
         <h3 class="text-gray-700 font-medium text-base">Tipo de Transferencia</h3>
 
         <AdminReportsFilterTransferDetailsSelector
-          v-model="transactionCodeString"
+          v-model="transferCodeString"
           :options="props.optionsFilters?.transactions ?? []"
         />
 
@@ -52,13 +52,10 @@
   }>();
 
   // Define models
-  const transactionCodeString = defineModel<string>("transaction-code-string");
+  const transferCodeString = defineModel<string>("transfer-code-string");
   const currencyCodeString = defineModel<string>("currency-code-string");
   const formattedDateObject = defineModel<Date | null>("formatted-date-object");
-
-
-  // Show/hide subpanel
-  const showFilters = ref(false);
+  const transferShowMore = defineModel<boolean>("transfer-show-more", { default: false });
 </script>
 
 <style scoped>

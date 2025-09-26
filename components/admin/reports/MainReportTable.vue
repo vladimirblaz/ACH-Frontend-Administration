@@ -1,7 +1,8 @@
 <template>
   <section>
     <div class="flex justify-between mb-5">
-      <div class="text-gray-700 text-xl">Transferencias encontradas: <span class="text-primary font-semibold">{{ props.transfersList.length }}</span></div>
+      <div class="text-gray-700 text-lg">Transferencias encontradas: <span class="text-primary font-semibold">{{ props.transfersList.length }}</span></div>
+      <XButton variant="outlined" class="font-medium flex items-center px-3" @click="generateDownloadCSV">Descargar</XButton>
     </div>
 
     <XTable size="small" class="report-table overflow-x-auto whitespace-nowrap block">
@@ -73,17 +74,17 @@
           <td>{{ transfer.amount }}</td>
           <td>{{ transfer.transactionDisplayName }}</td>
           <td>
-            <XTag v-if="transfer.statusDisplayName == 'Pendiente'" severity="warn" value="Pendiente" />
-            <XTag v-else-if="transfer.statusDisplayName == 'Procesado'" severity="success" value="Procesado" />
-            <XTag v-else-if="transfer.statusDisplayName == 'Aceptado'" severity="success" value="Aceptado" />
-            <XTag v-else-if="transfer.statusDisplayName == 'Rechazado'" severity="danger" value="Rechazado" />
+            <XTag v-if="transfer.statusDisplayName == 'Pendiente'" severity="warn" :value="transfer.statusDisplayName" />
+            <XTag v-else-if="transfer.statusDisplayName == 'Procesado'" severity="success" :value="transfer.statusDisplayName" />
+            <XTag v-else-if="transfer.statusDisplayName == 'Aceptado'" severity="success" :value="transfer.statusDisplayName" />
+            <XTag v-else-if="transfer.statusDisplayName == 'Rechazado'" severity="danger" :value="transfer.statusDisplayName" />
             <XTag v-else value="-" />
           </td>
           <td class="flex items-center">
-            <XButton v-tooltip.bottom="'Ver mensajes de orden'" variant="outlined">
+            <XButton v-tooltip.bottom="'Ver mensajes de orden'" variant="outlined" @click="() => openIndividualTransferMessage(transfer.traceNumber)">
               <Icon name="x:code" class="w-[14px] h-[14px] text-gray-800" />
             </XButton>
-            <XButton class="ml-3 font-medium px-6">Ver</XButton>
+            <XButton class="ml-3 font-medium px-6" @click="() => openIndividualTransfer(transfer.traceNumber)">Ver</XButton>
           </td>
         </tr>
       </tbody>
@@ -101,6 +102,8 @@
 
 <script setup lang="ts">
   import type { Transfers } from "~/features/reports/types";
+  import downloadjs from "downloadjs";
+  import dayjs from "dayjs";
 
   const props = defineProps<{
     transfersList: Transfers[];
@@ -138,6 +141,34 @@
   // Paginator
   const pageIndex = ref(0);
   const pageRows = ref(10);
+
+
+  // Routing
+  function openIndividualTransfer(traceNumber: string) {
+    useRouter().push(`/admin/reports/${encodeURIComponent(traceNumber || "123")}`);
+  }
+
+  function openIndividualTransferMessage(traceNumber: string) {
+    useRouter().push(`/admin/reports/${encodeURIComponent(traceNumber || "123")}/messages`);
+  }
+
+  // CSV
+  function generateDownloadCSV() {
+    const array = typeof props.transfersList !== "object" ? JSON.parse(props.transfersList) : props.transfersList;
+    let csv = "";
+
+    // Cabecera
+    const headers = Object.keys(array[0]).join(";");
+    csv += headers + "\r\n";
+
+    // Filas
+    array.forEach((transfer: Transfers) => {
+      const row = Object.values(transfer).map(value => `"${value}"`).join(";");
+      csv += row + "\r\n";
+    });
+    
+    downloadjs(csv, `transfers-list-${dayjs().format("YYYYMMDDHHmmss")}.csv`, "text/csv");
+  }
 </script>
 
 <style lang="postcss" scoped>

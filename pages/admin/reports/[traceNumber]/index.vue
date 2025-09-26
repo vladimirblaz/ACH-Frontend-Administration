@@ -5,10 +5,11 @@
       :breadcrumb-items="[
         { label: 'Inicio', url: '/' },
         { label: 'Monitoreo', url: '/transferencias' },
-        { label: 'Reporte', url: '/reports' },
+        { label: 'Reporte', url: '/admin/reports' },
         { label: `Transferencia [${traceNumber}]` },
       ]"
       :show-breadcrumb="true"
+      @back-click="goBack"
     />
     
     <p class="flex justify-between gap-4 mt-9">
@@ -147,5 +148,10 @@
     traceNumber.value = route.params.traceNumber;
 
     transfersResponse.value = await reportsService.getIndividualTransaction(traceNumber.value);
-  })
+  });
+
+
+  function goBack() {
+    useRouter().push("/admin/reports");
+  }
 </script>

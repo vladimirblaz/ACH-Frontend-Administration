@@ -1,162 +1,168 @@
 <template>
-  <KeepAlive>
-    <div>
-      <XHeader
-        title="Consulta de transferencias interbancarias"
-        :breadcrumb-items="[
-          { label: 'Inicio', url: '/' },
-          { label: 'Monitoreo', url: '/transferencias' },
-          { label: 'Reporte' },
-        ]"
-        :show-breadcrumb="true"
-      >
-        <template #description>
-          <p>
-            Consulta las transferencias interbancarias aplicando filtros en función a los criterios de búsqueda disponibles.
-          </p>
-        </template>
-      </XHeader>
-      
-      <p class="flex justify-between gap-4 mt-9">
-        Selecciona un tipo de movimiento y llena los campos necesarios para realizar la búsqueda.
-      </p>
+  <div>
+    <XHeader
+      title="Consulta de transferencias interbancarias"
+      :breadcrumb-items="[
+        { label: 'Inicio', url: '/' },
+        { label: 'Monitoreo', url: '/transferencias' },
+        { label: 'Reporte' },
+      ]"
+      :show-breadcrumb="true"
+    >
+      <template #description>
+        <p>
+          Consulta las transferencias interbancarias aplicando filtros en función a los criterios de búsqueda disponibles.
+        </p>
+      </template>
+    </XHeader>
+    
+    <p class="flex justify-between gap-4 mt-9">
+      Selecciona un tipo de movimiento y llena los campos necesarios para realizar la búsqueda.
+    </p>
 
-      <div class="flex justify-start my-9">
-        <AdminReportsMovementTypeSelector v-model="movementType" />
-      </div>
-
-      <div class="flex gap-6 w-full justify-between items-start">
-        <AdminReportsFilterClientDetails
-          v-model:customer-identifier="customerIdentifier"
-          v-model:customer-identifier-code="customerIdentifierCode"
-          :options-filters="optionsFilters"
-        />
-        <AdminReportsFilterTransferDetails
-          v-model:formatted-date-object="formattedDateObject"
-          v-model:transaction-code-string="transactionCodeString"
-          v-model:currency-code-string="currencyCodeString"
-          :options-filters="optionsFilters"
-        />
-        <AdminReportsFilterDestinationDetails
-          v-model:account-number="accountNumber"
-          v-model:external-participant-code="externalParticipantCode"
-          :options-filters="optionsFilters"
-          :movement-type="movementType"
-        />
-      </div>
-
-      <div class="mt-7">
-        <XSnackBar class="flex items-center" variant="info">
-          <p class="text-gray-700 ml-5">
-            Recuerda que al seleccionar la opción
-            <span class="font-bold">"Más criterios de búsqueda"</span>, se
-            habilitarán campos adicionales que te permitirán realizar la consulta
-            de manera más específica.
-          </p>
-        </XSnackBar>
-      </div>
-
-      <div class="flex justify-end gap-8 mt-7">
-        <XButton variant="text" @click="setFilterDefaultValues">
-          <div class="font-medium flex items-center px-3">
-            <Icon name="x:clean" />
-            <span class="ml-3">Limpiar</span>
-          </div>
-        </XButton>
-
-        <XButton :disabled="!isAbleToFilter" @click="searchTransfers">
-          <div class="font-medium flex items-center px-3">
-            <Icon name="x:search" />
-            <span class="ml-3">Buscar</span>
-          </div>
-        </XButton>
-      </div>
-
-      <AdminReportsMainReportTable
-        v-if="searched"
-        class="mt-9"
-        :transfers-list="transfersList"
-      />
-
-      <div class="mb-30" />
+    <div class="flex justify-start my-9">
+      <AdminReportsMovementTypeSelector v-model="useReportsStore.movementType" />
     </div>
-  </KeepAlive>
+
+    <div class="flex gap-6 w-full justify-between items-start">
+      <AdminReportsFilterClientDetails
+        v-model:customer-identifier="useReportsStore.customerIdentifier"
+        v-model:customer-identifier-code="useReportsStore.customerIdentifierCode"
+        :options-filters="optionsFilters"
+      />
+      <AdminReportsFilterTransferDetails
+        v-model:formatted-date-object="useReportsStore.formattedDateObject"
+        v-model:transfer-code-string="useReportsStore.transferCodeString"
+        v-model:currency-code-string="useReportsStore.currencyCodeString"
+        v-model:transfer-show-more="useReportsStore.transferShowMore"
+        :options-filters="optionsFilters"
+      />
+      <AdminReportsFilterDestinationDetails
+        v-model:account-number="useReportsStore.accountNumber"
+        v-model:external-participant-code="useReportsStore.externalParticipantCode"
+        v-model:destination-show-more="useReportsStore.destinationShowMore"
+        :options-filters="optionsFilters"
+        :movement-type="useReportsStore.movementType"
+      />
+    </div>
+
+    <div class="mt-7">
+      <XSnackBar class="flex items-center" variant="info">
+        <p class="text-gray-700 ml-5">
+          Recuerda que al seleccionar la opción
+          <span class="font-bold">"Más criterios de búsqueda"</span>, se
+          habilitarán campos adicionales que te permitirán realizar la consulta
+          de manera más específica.
+        </p>
+      </XSnackBar>
+    </div>
+
+    <div class="flex justify-end gap-8 mt-7">
+      <XButton variant="text" @click="setFilterDefaultValues">
+        <div class="font-medium flex items-center px-3">
+          <Icon name="x:clean" />
+          <span class="ml-3">Limpiar</span>
+        </div>
+      </XButton>
+
+      <XButton :disabled="!isAbleToFilter" @click="searchTransfers">
+        <div class="font-medium flex items-center px-3">
+          <Icon name="x:search" />
+          <span class="ml-3">Buscar</span>
+        </div>
+      </XButton>
+    </div>
+
+    <AdminReportsMainReportTable
+      v-if="useReportsStore.searched"
+      class="mt-9"
+      :transfers-list="useReportsStore.transfersList"
+    />
+
+    <div class="mb-30" />
+  </div>
 </template>
 
 <script setup lang="ts">
   import dayjs from "dayjs";
   import { reportsService } from "~/services/reportsService";
   import type { Filters, Transfers } from "~/features/reports/types";
-  
-  const movementType = ref<string>("SENT");
 
   const optionsFilters = ref<Filters>({});
 
   onMounted(async () => {
     optionsFilters.value = (await reportsService.getOptions()).Filters;
-    setFilterDefaultValues();
   });
 
-  // Filters
-  // Client Details
-  const customerIdentifierCode = ref("ACCOUNT");
-  const customerIdentifier = ref("");
 
-  // Transaction Details
-  const formattedDateObject = ref<Date | null>(null);
-  const transactionCodeString = ref("");
-  const currencyCodeString = ref("");
+  const useReportsStore = useState("reports-page-data", () => ({
+    movementType: "SENT",
 
-  // Destination Details
-  const accountNumber = ref("");
-  const externalParticipantCode = ref("");
+    // Client Details
+    customerIdentifierCode: "ACCOUNT",
+    customerIdentifier: null,
+
+    // Transfer Details
+    formattedDateObject: null,
+    transferCodeString: "ALL",
+    currencyCodeString: "ALL",
+    transferShowMore: false,
+
+    // Destination Details
+    accountNumber: null,
+    externalParticipantCode: "ALL",
+    destinationShowMore: false,
+
+    transfersList: [],
+
+    searched: false,
+  }));
   
 
   // Empty filters method
   function setFilterDefaultValues() {
-    customerIdentifierCode.value = "ACCOUNT";
-    customerIdentifier.value = null;
+    useReportsStore.value.customerIdentifierCode = "ACCOUNT";
+    useReportsStore.value.customerIdentifier = null;
 
-    formattedDateObject.value = null;
-    transactionCodeString.value = "ALL";
-    currencyCodeString.value = "ALL";
+    useReportsStore.value.formattedDateObject = null;
+    useReportsStore.value.transferCodeString = "ALL";
+    useReportsStore.value.currencyCodeString = "ALL";
+    useReportsStore.value.transferShowMore = false;
 
-    accountNumber.value = null;
-    externalParticipantCode.value = "ALL";
+    useReportsStore.value.accountNumber = null;
+    useReportsStore.value.externalParticipantCode = "ALL";
+    useReportsStore.value.destinationShowMore = false;
 
-    transfersList.value = [];
+    useReportsStore.value.transfersList = [];
 
-    searched.value = false;
+    useReportsStore.value.searched = false;
   }
 
 
-  const isAbleToFilter = computed(() => customerIdentifier.value && formattedDateObject.value && accountNumber.value);
+  const isAbleToFilter = computed(() => useReportsStore.value.customerIdentifier && useReportsStore.value.formattedDateObject && useReportsStore.value.accountNumber);
 
 
 
   // Search methods
-  const searched = ref(false);
-  const transfersList = ref<Transfers[]>([]);
-
   async function searchTransfers() {
     const transfersResponse = await reportsService.postRequestTransactional({
-      isInbound: ["RECEIVED", "BOTH"].includes(movementType.value),
-      isOutbound: ["SENT", "BOTH"].includes(movementType.value),
-      formattedDate: dayjs(formattedDateObject.value).format(),
-      customerIdentifierCode: customerIdentifierCode.value,
-      customerIdentifier: customerIdentifier.value,
-      currencyCodes: currencyCodeString.value == "ALL"
+      isInbound: ["RECEIVED", "BOTH"].includes(useReportsStore.value.movementType),
+      isOutbound: ["SENT", "BOTH"].includes(useReportsStore.value.movementType),
+      formattedDate: dayjs(useReportsStore.value.formattedDateObject).format(),
+      customerIdentifierCode: useReportsStore.value.customerIdentifierCode,
+      customerIdentifier: useReportsStore.value.customerIdentifier,
+      currencyCodes: useReportsStore.value.currencyCodeString == "ALL"
                       ? optionsFilters.value.currencies.map((c: Record<string, string>) => c.code)
-                      : [currencyCodeString.value],
-      transactionCodes: transactionCodeString.value == "ALL"
+                      : [useReportsStore.value.currencyCodeString],
+      transactionCodes: useReportsStore.value.transferCodeString == "ALL"
                           ? optionsFilters.value.transactions.map((c: Record<string, string>) => c.code)
-                          : [transactionCodeString.value],
-      accountNumber: accountNumber.value,
-      externalParticipantCode: externalParticipantCode.value == "ALL" ? "" : externalParticipantCode.value,
+                          : [useReportsStore.value.transferCodeString],
+      accountNumber: useReportsStore.value.accountNumber,
+      externalParticipantCode: useReportsStore.value.externalParticipantCode == "ALL" ? "" : useReportsStore.value.externalParticipantCode,
     });
 
-    transfersList.value = transfersResponse.transfers;
-    searched.value = true;
+    useReportsStore.value.transfersList = transfersResponse.transfers;
+    useReportsStore.value.searched = true;
   }
 
 </script>

@@ -3,7 +3,9 @@ import type {
   OptionsResponse,
   RequestTransactionalRequest,
   RequestTransactionalResponse,
-  IndividualTransactionResponse
+  IndividualTransactionResponse,
+  IndividualTransactionMessagesResponse,
+  IndividualTransactionMessagesXMLResponse
 } from './../features/reports/types';
 import { useLoading } from "~/componsables/useLoading";
 
@@ -53,6 +55,14 @@ class ReportsService {
 
   async getIndividualTransaction(traceNumber: string): Promise<IndividualTransactionResponse> {
     return this.request<IndividualTransactionResponse>(`analytics/reports/transactional/${encodeURIComponent(traceNumber)}`);
+  }
+
+  async getIndividualTransactionMessages(traceNumber: string): Promise<IndividualTransactionMessagesResponse> {
+    return this.request<IndividualTransactionMessagesResponse>(`analytics/reports/transactional/${encodeURIComponent(traceNumber)}/messages`);
+  }
+
+  async getIndividualTransactionMessagesXML(traceNumber: string, messageCode: string, attemptNumber: string): Promise<IndividualTransactionMessagesXMLResponse> {
+    return this.request<IndividualTransactionMessagesXMLResponse>(`analytics/reports/transactional/${encodeURIComponent(traceNumber)}/messages/payloads/${encodeURIComponent(messageCode)}/${encodeURIComponent(attemptNumber)}`);
   }
 }
 

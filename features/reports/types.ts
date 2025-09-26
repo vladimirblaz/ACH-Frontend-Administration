@@ -92,6 +92,19 @@ export interface Transfers {
   statusDisplayName: string;
 }
 
+export interface Messages {
+  messageCode: string;
+  attemptNumber: number;
+  createdFormattedDateTime: string;
+  updatedFormattedDateTime: string;
+  statusDescription: string;
+  returnCode: string;
+  returnCodeDescription: string;
+  hasPayload: boolean;
+}
+
+
+
 export interface OptionsResponse {
   Filters: Filters;
 }
@@ -142,4 +155,15 @@ export interface IndividualTransactionResponse {
     amount: number;
     transferId: string;
   }
+}
+
+
+export interface IndividualTransactionMessagesResponse {
+  messages: Messages[];
+}
+
+
+export interface IndividualTransactionMessagesXMLResponse {
+  mimeType: string;
+  content: string;
 }
